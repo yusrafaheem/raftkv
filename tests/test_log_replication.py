@@ -23,7 +23,7 @@ class TestBasicReplication(unittest.TestCase):
     def test_proposed_command_replicates_to_every_follower_and_commits(self):
         c = elected_cluster(seed=10)
         leader = c.leader()
-        result = c.propose(Command("client", 1, SetCommand("x", "1")))
+        result = c.propose(Command("client", 1, SetCommand("x", "1")), via=leader)
         self.assertIsNotNone(result.index)
         ok = c.run_until(lambda cl: cl.is_committed_everywhere(result.index), max_ticks=200)
         self.assertTrue(ok)
