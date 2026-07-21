@@ -33,9 +33,7 @@ class TestBasicReplication(unittest.TestCase):
 
     def test_multiple_commands_commit_in_proposed_order(self):
         c = elected_cluster(seed=11)
-        results = [
-            c.propose(Command("client", i, SetCommand("k", str(i)))) for i in range(1, 6)
-        ]
+        results = [c.propose(Command("client", i, SetCommand("k", str(i)))) for i in range(1, 6)]
         last_index = results[-1].index
         c.run_until(lambda cl: cl.is_committed_everywhere(last_index), max_ticks=300)
         for node_id in c.node_ids:
