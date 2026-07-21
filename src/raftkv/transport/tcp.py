@@ -261,7 +261,7 @@ def tcp_sender(
                 return None
             line = buf.split(b"\n", 1)[0]
             return decode_client_response(json.loads(line.decode()))
-        except (OSError, socket.timeout):
+        except (OSError, TimeoutError):
             return None
 
     return send
