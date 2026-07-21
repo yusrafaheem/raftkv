@@ -231,9 +231,7 @@ class RaftServer:
             return ClientResponse(ok=False, error="commit timed out")
 
 
-def tcp_sender(
-    node_addrs: dict[NodeId, tuple[str, int]], *, timeout: float = 2.0
-) -> SendFn:
+def tcp_sender(node_addrs: dict[NodeId, tuple[str, int]], *, timeout: float = 2.0) -> SendFn:
     """A blocking, socket-based `KVClient` sender that talks to a real
     `RaftServer` cluster's client ports. Deliberately synchronous (plain
     `socket`, not asyncio) since `KVClient` itself is synchronous -- this
