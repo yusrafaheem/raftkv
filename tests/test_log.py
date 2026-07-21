@@ -27,6 +27,14 @@ class TestEmptyLog(unittest.TestCase):
         log = RaftLog()
         self.assertIsNone(log.get(1))
 
+    def test_get_index_zero_returns_none(self):
+        log = RaftLog()
+        log.append(entry(1, term=1))
+        self.assertIsNone(log.get(0))
+
+    def test_len_on_empty_log_is_zero(self):
+        self.assertEqual(len(RaftLog()), 0)
+
     def test_entries_from_empty_log_is_empty(self):
         log = RaftLog()
         self.assertEqual(log.entries_from(1), [])
