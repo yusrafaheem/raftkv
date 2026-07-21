@@ -165,9 +165,7 @@ class TestStateMachineSafety(unittest.TestCase):
 
                 agreed_index = min(c.nodes[n].commit_index for n in c.node_ids)
                 for idx in range(1, agreed_index + 1):
-                    commands_at_idx = {
-                        c.nodes[n].log.get(idx).command for n in c.node_ids
-                    }
+                    commands_at_idx = {c.nodes[n].log.get(idx).command for n in c.node_ids}
                     self.assertEqual(
                         len(commands_at_idx),
                         1,
