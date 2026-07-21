@@ -111,6 +111,13 @@ class TestSlicing(unittest.TestCase):
         got = [e.command for e in self.log.entries_between(-5, 2)]
         self.assertEqual(got, ["cmd1", "cmd2"])
 
+    def test_entries_between_end_past_log_length_clamps_to_the_end(self):
+        got = [e.command for e in self.log.entries_between(4, 99)]
+        self.assertEqual(got, ["cmd4", "cmd5"])
+
+    def test_entries_between_start_greater_than_end_is_empty(self):
+        self.assertEqual(self.log.entries_between(4, 2), [])
+
 
 class TestTruncate(unittest.TestCase):
     def setUp(self):
