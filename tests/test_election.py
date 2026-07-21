@@ -91,6 +91,14 @@ class TestRequestVoteRpcSemantics(unittest.TestCase):
         reply = node.step(Message(2, 1, args))[0]
         self.assertTrue(reply.payload.vote_granted)
 
+    def test_grants_vote_when_candidate_log_has_same_last_term_and_is_at_least_as_long(self):
+        node = RaftNode(1, [2, 3])
+        node.current_term = 3
+        node.log.append(LogEntry(term=2, index=1, command="x"))
+        args = RequestVoteArgs(term=4, candidate_id=2, last_log_index=1, last_log_term=2)
+        reply = node.step(Message(2, 1, args))[0]
+        self.assertTrue(reply.payload.vote_granted)
+
     def test_rejects_vote_when_candidate_log_is_less_up_to_date(self):
         node = RaftNode(1, [2, 3])
         node.current_term = 3
