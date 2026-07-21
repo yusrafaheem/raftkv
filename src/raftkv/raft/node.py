@@ -248,12 +248,9 @@ class RaftNode:
         if args.term < self.current_term:
             return [self._vote_reply(src, granted=False)]
 
-        log_is_at_least_as_up_to_date = (
-            args.last_log_term > self.log.last_term()
-            or (
-                args.last_log_term == self.log.last_term()
-                and args.last_log_index >= self.log.last_index
-            )
+        log_is_at_least_as_up_to_date = args.last_log_term > self.log.last_term() or (
+            args.last_log_term == self.log.last_term()
+            and args.last_log_index >= self.log.last_index
         )
         already_voted_for_someone_else = self.voted_for not in (None, args.candidate_id)
 
