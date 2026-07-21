@@ -17,7 +17,6 @@ one follower's processing corrupt another's view of the same RPC.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Union
 
 from .log import LogEntry
 from .types import LogIndex, NodeId, Term
@@ -56,7 +55,7 @@ class AppendEntriesReply:
     match_index: LogIndex
 
 
-RpcPayload = Union[RequestVoteArgs, RequestVoteReply, AppendEntriesArgs, AppendEntriesReply]
+RpcPayload = RequestVoteArgs | RequestVoteReply | AppendEntriesArgs | AppendEntriesReply
 
 
 @dataclass(frozen=True, slots=True)
