@@ -29,8 +29,8 @@ from __future__ import annotations
 import itertools
 import time
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 from ..raft.types import NodeId
 from .store import CompareAndSwapCommand, DeleteCommand, GetCommand, Op, SetCommand
