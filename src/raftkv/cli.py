@@ -26,9 +26,7 @@ def _parse_addr_arg(value: str) -> tuple[int, str, int]:
         host, port_str = addr_part.rsplit(":", 1)
         return int(node_part), host, int(port_str)
     except ValueError:
-        raise argparse.ArgumentTypeError(
-            f"expected ID=HOST:PORT, got {value!r}"
-        ) from None
+        raise argparse.ArgumentTypeError(f"expected ID=HOST:PORT, got {value!r}") from None
 
 
 def main_node(argv: list[str] | None = None) -> int:
