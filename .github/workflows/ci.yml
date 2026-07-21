@@ -22,6 +22,6 @@ jobs:
       - name: Lint (ruff)
         run: ruff check src tests benchmarks
       - name: Format check (black)
-        run: black --check src tests benchmarks
+        run: black --check --diff src tests benchmarks
       - name: Run tests
         run: python -m unittest discover -s tests -v
