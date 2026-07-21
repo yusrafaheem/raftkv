@@ -76,7 +76,9 @@ class TestLeaderCrashMidWrite(unittest.TestCase):
                 c.run_until(lambda cl: cl.leader() is not None, max_ticks=300)
                 leader = c.leader()
             result = c.propose(Command("c", i, SetCommand(f"k{i}", f"v{i}")), via=leader)
-            ok = c.run_until(lambda cl: cl.is_committed_everywhere(result.index), max_ticks=200)
+            ok = c.run_until(
+                lambda cl, idx=result.index: cl.is_committed_everywhere(idx), max_ticks=200
+            )
             self.assertTrue(ok, f"write {i} failed to commit")
             written.append((f"k{i}", f"v{i}"))
             if len(c.alive) > 3:  # keep a majority alive so progress remains possible
