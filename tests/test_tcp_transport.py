@@ -133,6 +133,18 @@ class TestRealTcpCluster(unittest.IsolatedAsyncioTestCase):
         finally:
             await cluster.stop()
 
+    async def test_delete_over_real_sockets(self):
+        cluster = _Cluster([1, 2, 3], port_offset=50)
+        await cluster.start()
+        try:
+            await cluster.wait_for_leader()
+            client = cluster.client()
+            await asyncio.to_thread(client.set, "x", "1")
+            await asyncio.to_thread(client.delete, "x")
+            self.assertIsNone(await asyncio.to_thread(client.get, "x"))
+        finally:
+            await cluster.stop()
+
     async def test_contacting_a_non_leader_node_first_still_succeeds(self):
         cluster = _Cluster([1, 2, 3], port_offset=40)
         await cluster.start()
