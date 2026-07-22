@@ -104,6 +104,17 @@ class TestLogMatchingAndConflictResolution(unittest.TestCase):
         self.assertEqual(follower.log.last_index, 2)
         self.assertEqual(follower.log.get(2).command, "fresh-b")
 
+    def test_follower_accepts_an_empty_heartbeat_when_prev_log_matches(self):
+        follower = RaftNode(2, [1, 3])
+        follower.current_term = 1
+        follower.log.append(LogEntry(term=1, index=1, command="a"))
+        args = AppendEntriesArgs(
+            term=1, leader_id=1, prev_log_index=1, prev_log_term=1, entries=(), leader_commit=0
+        )
+        reply = follower.step(Message(1, 2, args))[0]
+        self.assertTrue(reply.payload.success)
+        self.assertEqual(follower.log.last_index, 1)  # heartbeat carried no entries to append
+
     def test_duplicate_append_entries_is_idempotent(self):
         follower = RaftNode(2, [1, 3])
         follower.current_term = 1
