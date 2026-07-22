@@ -48,6 +48,12 @@ class TestBasicClientOperations(unittest.TestCase):
         self.assertFalse(client.compare_and_swap("x", "stale", "3"))
         self.assertEqual(client.get("x"), "2")
 
+    def test_two_independently_constructed_clients_get_distinct_generated_ids(self):
+        c = elected_cluster(seed=21)
+        first = make_client(c)
+        second = make_client(c)
+        self.assertNotEqual(first.client_id, second.client_id)
+
     def test_client_starts_with_no_known_leader_and_still_succeeds(self):
         c = elected_cluster(seed=5)
         client = make_client(c)
