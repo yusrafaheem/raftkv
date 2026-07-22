@@ -15,6 +15,11 @@ class TestRoleEnum(unittest.TestCase):
         self.assertEqual(Role.LEADER, "leader")
         self.assertIsInstance(Role.LEADER, str)
 
+    def test_role_members_are_distinct_from_one_another(self):
+        self.assertNotEqual(Role.FOLLOWER, Role.CANDIDATE)
+        self.assertNotEqual(Role.CANDIDATE, Role.LEADER)
+        self.assertNotEqual(Role.FOLLOWER, Role.LEADER)
+
 
 class TestPackageVersion(unittest.TestCase):
     def test_package_exposes_a_version_string(self):
