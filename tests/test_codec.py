@@ -102,6 +102,25 @@ class TestMessageRoundTrip(unittest.TestCase):
         self.assertEqual(decode_message(round_tripped_through_json), msg)
 
 
+class TestUnknownTypesAreRejected(unittest.TestCase):
+    """Decoding must never silently guess a shape from partial fields --
+    an unrecognized "type" tag should fail loudly rather than risk
+    handing a node a malformed RPC or command (see this module's
+    docstring)."""
+
+    def test_decode_message_rejects_an_unknown_payload_type(self):
+        from raftkv.transport.codec import decode_message
+
+        with self.assertRaises(ValueError):
+            decode_message({"src": 1, "dst": 2, "payload": {"type": "NotARealRpc"}})
+
+    def test_decode_op_rejects_an_unknown_op_type(self):
+        from raftkv.transport.codec import decode_op
+
+        with self.assertRaises(ValueError):
+            decode_op({"type": "NotARealOp"})
+
+
 class TestClientProtocolRoundTrip(unittest.TestCase):
     def test_client_request_round_trips(self):
         req = ClientRequest("client-a", 7, SetCommand("x", "1"))
