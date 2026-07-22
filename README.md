@@ -61,7 +61,7 @@ raftkv-cli --node 1=127.0.0.1:8001 --node 2=127.0.0.1:8002 --node 3=127.0.0.1:80
 
 ## Testing
 
-102 tests, `python -m unittest discover -s tests`, no external dependencies, ~2 seconds wall-clock for the whole suite (most of that from the 5 tests that spin up real TCP servers on localhost).
+130+ tests, `python -m unittest discover -s tests`, no external dependencies, ~2 seconds wall-clock for the whole suite (most of that from the 5 tests that spin up real TCP servers on localhost).
 
 - `test_log.py` -- unit tests of the replicated log itself (append ordering, truncation, term lookups).
 - `test_election.py` -- leader election: single-node clusters, 3- and 5-node clusters across many seeds, and direct unit tests of every `RequestVote` branch (stale term, already-voted, log-too-short, higher-term step-down, stale/late replies ignored).
@@ -72,6 +72,8 @@ raftkv-cli --node 1=127.0.0.1:8001 --node 2=127.0.0.1:8002 --node 3=127.0.0.1:80
 - `test_client.py` -- `KVClient`'s leader discovery, failover, and retry-budget-exhaustion behavior.
 - `test_linearizability.py` -- see below.
 - `test_codec.py` / `test_tcp_transport.py` -- wire-format round-trips and end-to-end tests of the real asyncio TCP transport (real sockets on localhost, not simulated).
+- `test_rpc.py` / `test_types.py` -- direct unit tests of the RPC dataclasses and the `Role` enum, isolated from the wire format and from any running cluster.
+- `test_cluster.py` / `test_simulated_network.py` -- direct unit tests of the test harness itself (`SimulatedCluster` and `SimulatedNetwork`), since a harness bug could otherwise quietly make every other test meaningless.
 
 **On the linearizability test specifically:** because every operation (including reads) is linearized by its position in the committed log, this project's linearizability check can be unusually direct compared to a generic black-box history checker. Several client identities issue randomly interleaved get/set/delete/cas requests against a cluster that's simultaneously being partitioned and having nodes killed and revived; the test then replays the one true committed log order against a fresh reference state machine and confirms every client-observed result matches exactly what that replay produces. It's both a linearizability check and a chaos test in one.
 
