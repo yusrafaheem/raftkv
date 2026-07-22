@@ -124,6 +124,14 @@ class TestCompareAndSwapRoundTripThroughTheClient(unittest.TestCase):
         self.assertEqual(client.get("counter"), "1")
 
 
+class TestDeleteThroughTheClient(unittest.TestCase):
+    def test_deleting_a_missing_key_is_a_harmless_no_op(self):
+        c = elected_cluster(seed=23)
+        client = make_client(c)
+        client.delete("never-set")  # must not raise
+        self.assertIsNone(client.get("never-set"))
+
+
 class TestResponseShape(unittest.TestCase):
     def test_client_response_defaults(self):
         r = ClientResponse(ok=True)
