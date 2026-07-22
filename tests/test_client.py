@@ -115,6 +115,15 @@ class TestRequestIdempotencyAcrossRetries(unittest.TestCase):
         self.assertEqual(c.state_machines[c.leader()].get("counter"), "once")
 
 
+class TestCompareAndSwapRoundTripThroughTheClient(unittest.TestCase):
+    def test_cas_expecting_none_only_succeeds_once(self):
+        c = elected_cluster(seed=22)
+        client = make_client(c)
+        self.assertTrue(client.compare_and_swap("counter", None, "1"))
+        self.assertFalse(client.compare_and_swap("counter", None, "2"))
+        self.assertEqual(client.get("counter"), "1")
+
+
 class TestResponseShape(unittest.TestCase):
     def test_client_response_defaults(self):
         r = ClientResponse(ok=True)
