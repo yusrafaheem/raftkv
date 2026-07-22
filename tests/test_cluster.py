@@ -59,5 +59,20 @@ class TestLeadersBeforeElection(unittest.TestCase):
         self.assertEqual(c.leaders(), [])
 
 
+class TestIsCommittedEverywhereIgnoresDeadNodes(unittest.TestCase):
+    def test_a_dead_laggard_does_not_block_is_committed_everywhere(self):
+        c = SimulatedCluster([1, 2, 3], seed=6)
+        c.run_until(lambda cl: cl.leader() is not None, max_ticks=200)
+        laggard = next(n for n in c.node_ids if n != c.leader())
+        c.kill(laggard)
+        leader = c.leader()
+        result = c.propose(Command("c", 1, SetCommand("x", "1")), via=leader)
+        ok = c.run_until(lambda cl: cl.is_committed_everywhere(result.index), max_ticks=200)
+        # majority (2 of 3) can commit even with the laggard dead, and
+        # is_committed_everywhere only checks *alive* nodes -- see its
+        # docstring/implementation in cluster.py.
+        self.assertTrue(ok)
+
+
 if __name__ == "__main__":
     unittest.main()
