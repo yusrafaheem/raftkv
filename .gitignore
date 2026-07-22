@@ -8,3 +8,8 @@ dist/
 .pytest_cache/
 .ruff_cache/
 *.raftlog
+.DS_Store
+.vscode/
+.idea/
+.coverage
+htmlcov/
