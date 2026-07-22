@@ -38,6 +38,12 @@ class TestKillAndRevive(unittest.TestCase):
         c.revive(1)  # never killed
         self.assertEqual(c.alive, {1, 2, 3})
 
+    def test_killing_an_already_dead_node_twice_is_a_harmless_no_op(self):
+        c = SimulatedCluster([1, 2, 3], seed=10)
+        c.kill(2)
+        c.kill(2)  # kill it again while already dead
+        self.assertEqual(c.alive, {1, 3})
+
     def test_a_revived_nodes_raft_state_survived_being_dead(self):
         c = SimulatedCluster([1, 2, 3], seed=4)
         c.run_until(lambda cl: cl.leader() is not None, max_ticks=200)
