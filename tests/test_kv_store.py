@@ -92,6 +92,12 @@ class TestCompareAndSwap(unittest.TestCase):
         self.assertFalse(second)
         self.assertEqual(self.sm.get("x"), "from-a")
 
+    def test_cas_expecting_none_fails_once_the_key_has_been_set(self):
+        self.sm.apply(Command("c", 1, SetCommand("x", "1")))
+        result = self.sm.apply(Command("c", 2, CompareAndSwapCommand("x", None, "2")))
+        self.assertFalse(result)
+        self.assertEqual(self.sm.get("x"), "1")
+
 
 class TestClientRequestDeduplication(unittest.TestCase):
     """Section 8 of the Raft paper: applying the same (client_id,
