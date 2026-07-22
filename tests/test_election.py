@@ -161,6 +161,20 @@ class TestVoteReplyIgnoredOnceAlreadyLeader(unittest.TestCase):
         self.assertEqual(node.role, Role.LEADER)
 
 
+class TestBecomeFollowerPreservesVoteWithinTheSameTerm(unittest.TestCase):
+    def test_stepping_down_to_follower_at_the_same_term_does_not_clear_the_recorded_vote(self):
+        # A candidate that sees a same-term AppendEntries from a legitimate
+        # leader steps down, but it must not forget who it already voted
+        # for in *this* term -- only a strictly newer term resets that.
+        node = RaftNode(1, [2, 3], rng=random.Random(0))
+        node.role = Role.CANDIDATE
+        node.current_term = 3
+        node.voted_for = 1  # voted for itself when it became a candidate
+        node._become_follower(3)
+        self.assertEqual(node.voted_for, 1)
+        self.assertEqual(node.current_term, 3)
+
+
 class TestAppendEntriesCausesElectionStepDown(unittest.TestCase):
     def test_candidate_steps_down_on_append_entries_from_legitimate_leader(self):
         node = RaftNode(1, [2, 3], rng=random.Random(0))
