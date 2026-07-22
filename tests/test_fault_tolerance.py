@@ -188,14 +188,14 @@ class TestRepeatedPartitionAndHeal(unittest.TestCase):
             majority = set(c.node_ids) - minority
             c.partition([minority, majority])
             c.run_until(
-                lambda cl: any(cl.nodes[n].role.value == "leader" for n in majority),
+                lambda cl, maj=majority: any(cl.nodes[n].role.value == "leader" for n in maj),
                 max_ticks=400,
             )
             majority_leader = next(n for n in majority if c.nodes[n].role.value == "leader")
             result = c.propose(Command("c", i, SetCommand(f"k{i}", f"v{i}")), via=majority_leader)
             ok = c.run_until(
-                lambda cl, idx=result.index: all(
-                    cl.nodes[n].commit_index >= idx for n in majority
+                lambda cl, idx=result.index, maj=majority: all(
+                    cl.nodes[n].commit_index >= idx for n in maj
                 ),
                 max_ticks=300,
             )
