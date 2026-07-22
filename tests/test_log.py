@@ -116,6 +116,11 @@ class TestSlicing(unittest.TestCase):
     def test_entries_from_past_end_is_empty(self):
         self.assertEqual(self.log.entries_from(10), [])
 
+    def test_entries_from_returns_a_fresh_list_each_call(self):
+        first = self.log.entries_from(1)
+        first.clear()
+        self.assertEqual(len(self.log.entries_from(1)), 5)  # log itself untouched
+
     def test_entries_between_inclusive_range(self):
         got = [e.command for e in self.log.entries_between(2, 4)]
         self.assertEqual(got, ["cmd2", "cmd3", "cmd4"])
