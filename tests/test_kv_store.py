@@ -40,6 +40,12 @@ class TestBasicOps(unittest.TestCase):
         self.sm.apply(Command("c", 1, DeleteCommand("nope")))
         self.assertIsNone(self.sm.get("nope"))
 
+    def test_set_after_delete_recreates_the_key(self):
+        self.sm.apply(Command("c", 1, SetCommand("x", "1")))
+        self.sm.apply(Command("c", 2, DeleteCommand("x")))
+        self.sm.apply(Command("c", 3, SetCommand("x", "2")))
+        self.assertEqual(self.sm.get("x"), "2")
+
     def test_applied_count_increases_once_per_new_command(self):
         self.sm.apply(Command("c", 1, SetCommand("x", "1")))
         self.sm.apply(Command("c", 2, SetCommand("y", "2")))
