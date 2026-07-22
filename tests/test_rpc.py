@@ -10,7 +10,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from raftkv.raft.log import LogEntry
-from raftkv.raft.rpc import AppendEntriesArgs, Message, RequestVoteArgs
+from raftkv.raft.rpc import AppendEntriesArgs, AppendEntriesReply, Message, RequestVoteArgs
 
 
 class TestMessageEnvelope(unittest.TestCase):
@@ -58,6 +58,13 @@ class TestAppendEntriesArgsShape(unittest.TestCase):
         self.assertEqual(args.entries, (e1, e2))
         with self.assertRaises(AttributeError):
             args.entries = ()  # type: ignore[misc]
+
+
+class TestAppendEntriesReplyEquality(unittest.TestCase):
+    def test_replies_differing_only_in_match_index_are_not_equal(self):
+        a = AppendEntriesReply(term=1, success=True, follower_id=2, match_index=3)
+        b = AppendEntriesReply(term=1, success=True, follower_id=2, match_index=4)
+        self.assertNotEqual(a, b)
 
 
 if __name__ == "__main__":
