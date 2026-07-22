@@ -49,6 +49,12 @@ class TestBasicReplication(unittest.TestCase):
         result = c.propose(Command("client", 1, SetCommand("x", "1")), via=follower)
         self.assertIsNone(result.index)
 
+    def test_a_rejected_proposal_produces_no_outbound_messages(self):
+        c = elected_cluster(seed=14)
+        follower = next(n for n in c.node_ids if n != c.leader())
+        result = c.propose(Command("client", 1, SetCommand("x", "1")), via=follower)
+        self.assertEqual(result.messages, ())
+
     def test_propose_on_a_candidate_is_rejected(self):
         node = RaftNode(1, [2, 3])
         node.role = Role.CANDIDATE
