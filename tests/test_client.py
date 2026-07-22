@@ -117,5 +117,16 @@ class TestResponseShape(unittest.TestCase):
         self.assertIsNone(r.error)
 
 
+class TestConstruction(unittest.TestCase):
+    def test_empty_node_ids_list_is_rejected(self):
+        with self.assertRaises(ValueError):
+            KVClient([], send=lambda node_id, request: None)
+
+    def test_a_caller_supplied_client_id_is_used_instead_of_a_generated_one(self):
+        c = elected_cluster(seed=20)
+        client = make_client(c, client_id="fixed-id")
+        self.assertEqual(client.client_id, "fixed-id")
+
+
 if __name__ == "__main__":
     unittest.main()
