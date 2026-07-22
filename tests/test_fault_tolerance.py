@@ -177,5 +177,20 @@ class TestNodeRevival(unittest.TestCase):
         self.assertEqual(c.state_machines[laggard].get("k"), "10")
 
 
+class TestSimultaneousKills(unittest.TestCase):
+    def test_cluster_recovers_after_two_non_leader_nodes_die_at_once(self):
+        c = elected_cluster([1, 2, 3, 4, 5], seed=8)
+        leader = c.leader()
+        victims = [n for n in c.node_ids if n != leader][:2]
+        for v in victims:
+            c.kill(v)
+
+        result = c.propose(Command("c", 1, SetCommand("x", "1")), via=leader)
+        ok = c.run_until(lambda cl: cl.is_committed_everywhere(result.index), max_ticks=200)
+        self.assertTrue(ok)
+        for n in c.alive:
+            self.assertEqual(c.state_machines[n].get("x"), "1")
+
+
 if __name__ == "__main__":
     unittest.main()
