@@ -23,6 +23,16 @@ class TestSingleNodeCluster(unittest.TestCase):
         self.assertEqual(messages, [])  # no peers to send heartbeats to
 
 
+class TestSingleNodeClusterWithExistingLog(unittest.TestCase):
+    def test_single_node_still_becomes_leader_even_with_a_pre_existing_log(self):
+        node = RaftNode(1, [], rng=random.Random(0))
+        node.log.append(LogEntry(term=0, index=1, command="pre-existing"))
+        while node.role is not Role.LEADER:
+            node.tick()
+        self.assertEqual(node.role, Role.LEADER)
+        self.assertEqual(node.log.last_index, 1)  # untouched by becoming leader
+
+
 class TestThreeNodeElection(unittest.TestCase):
     def test_a_leader_is_elected_within_a_bounded_number_of_ticks(self):
         c = SimulatedCluster([1, 2, 3], seed=1)
@@ -136,6 +146,19 @@ class TestRequestVoteRpcSemantics(unittest.TestCase):
         reply = RequestVoteReply(term=1, vote_granted=True, voter_id=2)
         out = node.step(Message(2, 1, reply))
         self.assertEqual(out, [])
+
+
+class TestVoteReplyIgnoredOnceAlreadyLeader(unittest.TestCase):
+    def test_a_late_vote_reply_after_already_winning_the_election_is_a_harmless_no_op(self):
+        node = RaftNode(1, [2, 3], rng=random.Random(0))
+        node.role = Role.CANDIDATE
+        node.current_term = 1
+        node.votes_received = {1, 2}  # already has a majority, e.g. from node 2's reply
+        node._become_leader()
+        late_reply = RequestVoteReply(term=1, vote_granted=True, voter_id=3)
+        out = node.step(Message(3, 1, late_reply))
+        self.assertEqual(out, [])
+        self.assertEqual(node.role, Role.LEADER)
 
 
 class TestAppendEntriesCausesElectionStepDown(unittest.TestCase):
