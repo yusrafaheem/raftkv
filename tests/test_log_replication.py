@@ -49,6 +49,13 @@ class TestBasicReplication(unittest.TestCase):
         result = c.propose(Command("client", 1, SetCommand("x", "1")), via=follower)
         self.assertIsNone(result.index)
 
+    def test_propose_on_a_candidate_is_rejected(self):
+        node = RaftNode(1, [2, 3])
+        node.role = Role.CANDIDATE
+        result = node.propose("x")
+        self.assertIsNone(result.index)
+        self.assertEqual(result.messages, ())
+
     def test_commit_index_does_not_advance_without_a_majority(self):
         # 5-node cluster: partition the leader off with only one follower,
         # leaving it short of a majority (2 of 5).
