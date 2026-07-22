@@ -29,6 +29,9 @@ raftkv-cli = "raftkv.cli:main_client"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+raftkv = ["py.typed"]
+
 [tool.black]
 line-length = 100
 target-version = ["py310"]
