@@ -31,6 +31,18 @@ class TestMessageEnvelope(unittest.TestCase):
             msg.dst = 99  # type: ignore[misc]
 
 
+class TestRequestVoteArgsEquality(unittest.TestCase):
+    def test_two_request_vote_args_with_the_same_fields_are_equal(self):
+        a = RequestVoteArgs(term=1, candidate_id=2, last_log_index=3, last_log_term=1)
+        b = RequestVoteArgs(term=1, candidate_id=2, last_log_index=3, last_log_term=1)
+        self.assertEqual(a, b)
+
+    def test_request_vote_args_differing_only_in_term_are_not_equal(self):
+        a = RequestVoteArgs(term=1, candidate_id=2, last_log_index=3, last_log_term=1)
+        b = RequestVoteArgs(term=2, candidate_id=2, last_log_index=3, last_log_term=1)
+        self.assertNotEqual(a, b)
+
+
 class TestAppendEntriesArgsShape(unittest.TestCase):
     def test_entries_tuple_is_immutable_and_order_preserving(self):
         e1 = LogEntry(term=1, index=1, command="a")
