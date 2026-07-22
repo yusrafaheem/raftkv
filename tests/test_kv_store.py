@@ -51,6 +51,11 @@ class TestBasicOps(unittest.TestCase):
         self.sm.apply(Command("c", 2, SetCommand("y", "2")))
         self.assertEqual(self.sm.applied_count, 2)
 
+    def test_applied_count_counts_every_apply_call_including_reads(self):
+        self.sm.apply(Command("c", 1, SetCommand("x", "1")))
+        self.sm.apply(Command("c", 2, GetCommand("x")))
+        self.assertEqual(self.sm.applied_count, 2)
+
 
 class TestCompareAndSwap(unittest.TestCase):
     def setUp(self):
