@@ -130,6 +130,10 @@ class TestClientProtocolRoundTrip(unittest.TestCase):
         resp = ClientResponse(ok=True, result="1")
         self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
 
+    def test_client_response_round_trips_a_failure_with_no_leader_hint(self):
+        resp = ClientResponse(ok=False, error="timed out")
+        self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
+
     def test_client_response_round_trips_error_with_leader_hint(self):
         resp = ClientResponse(ok=False, leader_hint=3, error="not leader")
         self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
