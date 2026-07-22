@@ -107,6 +107,12 @@ class TestClientProtocolRoundTrip(unittest.TestCase):
         resp = ClientResponse(ok=False, leader_hint=3, error="not leader")
         self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
 
+    def test_client_response_round_trips_a_none_result(self):
+        # SetCommand and DeleteCommand both return None on success -- make
+        # sure that's distinguishable on the wire from "no field sent".
+        resp = ClientResponse(ok=True, result=None)
+        self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
+
 
 if __name__ == "__main__":
     unittest.main()
