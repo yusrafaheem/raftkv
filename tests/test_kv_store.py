@@ -136,6 +136,9 @@ class TestSnapshot(unittest.TestCase):
         self.assertEqual(snap, {"x": "1"})
         self.assertEqual(sm.get("x"), "2")
 
+    def test_snapshot_of_a_fresh_state_machine_is_empty(self):
+        self.assertEqual(KVStateMachine().snapshot(), {})
+
 
 if __name__ == "__main__":
     unittest.main()
