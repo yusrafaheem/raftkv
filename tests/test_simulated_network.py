@@ -56,6 +56,17 @@ class TestPartitionWithAnUnlistedNode(unittest.TestCase):
         self.assertEqual(net.pending_count(), 0)
 
 
+class TestHeal(unittest.TestCase):
+    def test_heal_undoes_a_partition_and_messages_flow_again(self):
+        net = SimulatedNetwork(random.Random(0))
+        net.partition([{1}, {2, 3}])
+        net.send(msg(1, 2))
+        self.assertEqual(net.pending_count(), 0)  # still partitioned
+        net.heal()
+        net.send(msg(1, 2))
+        self.assertEqual(net.pending_count(), 1)
+
+
 class TestNowAdvancesMonotonically(unittest.TestCase):
     def test_now_starts_at_zero_and_increments_once_per_advance(self):
         net = SimulatedNetwork(random.Random(0))
