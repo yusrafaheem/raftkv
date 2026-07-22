@@ -50,6 +50,14 @@ class TestOpRoundTrip(unittest.TestCase):
         self.assertEqual(self._round_trip_command(cmd2), cmd2)
 
 
+class TestLogEntryRoundTrip(unittest.TestCase):
+    def test_a_bare_log_entry_round_trips_through_encode_decode_entry(self):
+        from raftkv.transport.codec import decode_entry, encode_entry
+
+        entry = LogEntry(term=3, index=7, command=Command("c", 1, SetCommand("x", "1")))
+        self.assertEqual(decode_entry(encode_entry(entry)), entry)
+
+
 class TestMessageRoundTrip(unittest.TestCase):
     def test_request_vote_args_round_trips(self):
         args = RequestVoteArgs(term=3, candidate_id=1, last_log_index=5, last_log_term=2)
