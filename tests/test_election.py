@@ -12,6 +12,16 @@ from raftkv.raft.rpc import AppendEntriesArgs, Message, RequestVoteArgs, Request
 from raftkv.raft.types import Role
 
 
+class TestRaftNodeRepr(unittest.TestCase):
+    def test_repr_includes_id_role_term_and_commit_index(self):
+        node = RaftNode(1, [2, 3])
+        text = repr(node)
+        self.assertIn("id=1", text)
+        self.assertIn("role=follower", text)
+        self.assertIn("term=0", text)
+        self.assertIn("commit=0", text)
+
+
 class TestSingleNodeCluster(unittest.TestCase):
     def test_single_node_becomes_leader_on_first_election(self):
         node = RaftNode(1, [], rng=random.Random(0))
