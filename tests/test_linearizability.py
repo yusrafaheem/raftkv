@@ -176,7 +176,7 @@ class TestLinearizabilityUnderChaos(unittest.TestCase):
         )
 
     def test_linearizable_history_across_several_seeds_under_chaos(self):
-        for seed in range(10):
+        for seed in range(15):
             with self.subTest(seed=seed):
                 c, observed = self._run_one(seed)
                 self.assertGreater(len(observed), 0, "no requests completed -- test is vacuous")
