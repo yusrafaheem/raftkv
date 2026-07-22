@@ -185,6 +185,14 @@ class TestBecomeFollowerPreservesVoteWithinTheSameTerm(unittest.TestCase):
         self.assertEqual(node.current_term, 3)
 
 
+class TestCandidateCountsItsOwnVote(unittest.TestCase):
+    def test_starting_an_election_immediately_counts_a_vote_from_self(self):
+        node = RaftNode(1, [2, 3], rng=random.Random(0))
+        node._start_election()
+        self.assertIn(1, node.votes_received)
+        self.assertEqual(node.role, Role.CANDIDATE)
+
+
 class TestAppendEntriesCausesElectionStepDown(unittest.TestCase):
     def test_candidate_steps_down_on_append_entries_from_legitimate_leader(self):
         node = RaftNode(1, [2, 3], rng=random.Random(0))
