@@ -4,6 +4,10 @@ A from-scratch implementation of the [Raft consensus algorithm](https://raft.git
 
 This exists to demonstrate distributed-systems fundamentals end to end: leader election, log replication, the safety proofs Raft is actually known for, and the testing discipline needed to trust a consensus implementation at all. It's the fourth in a series of from-scratch systems projects (alongside [vectorgrad](../vectorgrad), an autodiff/ML engine, [ragent](../ragent), a RAG/agent infra project, and [minirel](../minirel), a relational database engine) -- this one specifically fills in distributed systems.
 
+## Requirements
+
+Python 3.10+, no external dependencies for the library itself. `ruff` and `black` are only needed for the `[dev]` extra (linting/formatting, matching what CI runs).
+
 ## Architecture
 
 The core design choice: **consensus is a library, not a service.** `RaftNode` (`src/raftkv/raft/node.py`) is a pure state machine -- it performs no I/O, spawns no threads, and owns no clock. It exposes exactly three entry points:
