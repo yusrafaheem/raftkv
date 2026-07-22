@@ -204,5 +204,22 @@ class TestStateMachineSafety(unittest.TestCase):
                     )
 
 
+class TestCandidateNeedsAStrictMajority(unittest.TestCase):
+    """In a 5-node cluster a candidate needs 3 votes (itself plus 2
+    others) to become leader -- a self-vote plus a single granted vote
+    (2 of 5) must not be enough, even though it's more than one."""
+
+    def test_a_candidate_with_only_two_of_five_votes_does_not_become_leader(self):
+        from raftkv.raft.node import RaftNode
+        from raftkv.raft.rpc import Message, RequestVoteReply
+        from raftkv.raft.types import Role
+
+        node = RaftNode(1, [2, 3, 4, 5])
+        node._start_election()
+        node.step(Message(2, 1, RequestVoteReply(term=1, vote_granted=True, voter_id=2)))
+        self.assertEqual(node.role, Role.CANDIDATE)
+        self.assertEqual(len(node.votes_received), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
