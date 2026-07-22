@@ -56,6 +56,16 @@ class TestPartitionWithAnUnlistedNode(unittest.TestCase):
         self.assertEqual(net.pending_count(), 0)
 
 
+class TestNowAdvancesMonotonically(unittest.TestCase):
+    def test_now_starts_at_zero_and_increments_once_per_advance(self):
+        net = SimulatedNetwork(random.Random(0))
+        self.assertEqual(net.now, 0)
+        net.advance()
+        net.advance()
+        net.advance()
+        self.assertEqual(net.now, 3)
+
+
 class TestDropAllPending(unittest.TestCase):
     def test_drop_all_pending_clears_the_queue_and_counts_as_dropped(self):
         net = SimulatedNetwork(random.Random(0))
