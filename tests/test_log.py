@@ -156,6 +156,12 @@ class TestTruncate(unittest.TestCase):
         self.assertEqual(self.log.last_index, 3)
         self.assertEqual(self.log.get(3).command, "replacement")
 
+    def test_last_term_reflects_the_log_after_truncation(self):
+        self.log.truncate_from(3)  # drops the term=1 entries at index 3+
+        self.assertEqual(self.log.last_term(), 1)  # index 2's term
+        self.log.truncate_from(1)
+        self.assertEqual(self.log.last_term(), 0)  # log is empty again
+
 
 if __name__ == "__main__":
     unittest.main()
