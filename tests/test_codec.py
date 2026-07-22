@@ -134,6 +134,12 @@ class TestClientProtocolRoundTrip(unittest.TestCase):
         resp = ClientResponse(ok=False, leader_hint=3, error="not leader")
         self.assertEqual(decode_client_response(encode_client_response(resp)), resp)
 
+    def test_client_request_round_trips_a_cas_op(self):
+        from raftkv.kv.store import CompareAndSwapCommand
+
+        req = ClientRequest("client-a", 3, CompareAndSwapCommand("x", "old", "new"))
+        self.assertEqual(decode_client_request(encode_client_request(req)), req)
+
     def test_client_response_round_trips_a_none_result(self):
         # SetCommand and DeleteCommand both return None on success -- make
         # sure that's distinguishable on the wire from "no field sent".
