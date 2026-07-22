@@ -41,6 +41,11 @@ class TestEmptyLog(unittest.TestCase):
 
 
 class TestAppend(unittest.TestCase):
+    def test_first_append_starts_at_index_one(self):
+        log = RaftLog()
+        with self.assertRaises(ValueError):
+            log.append(entry(2, term=1))  # index 1 must come first
+
     def test_append_grows_last_index_and_term(self):
         log = RaftLog()
         log.append(entry(1, term=1))
