@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from raftkv.cluster import SimulatedCluster
 from raftkv.kv.store import Command, SetCommand
+from raftkv.raft.types import Role
 
 
 def elected_cluster(node_ids, seed):
@@ -216,6 +217,24 @@ class TestSimultaneousKills(unittest.TestCase):
         self.assertTrue(ok)
         for n in c.alive:
             self.assertEqual(c.state_machines[n].get("x"), "1")
+
+
+class TestLeaderIsolatedAlone(unittest.TestCase):
+    def test_a_leader_partitioned_off_by_itself_cannot_commit_and_a_new_leader_takes_over(self):
+        c = elected_cluster([1, 2, 3, 4, 5], seed=6)
+        old_leader = c.leader()
+        others = [n for n in c.node_ids if n != old_leader]
+        c.partition([{old_leader}, set(others)])
+
+        c.propose(Command("c", 1, SetCommand("x", "1")), via=old_leader)
+        c.run(50)
+        self.assertEqual(c.nodes[old_leader].commit_index, 0)
+
+        def a_new_leader_emerged_among_the_majority(cl):
+            return any(cl.nodes[n].role is Role.LEADER for n in others)
+
+        ok = c.run_until(a_new_leader_emerged_among_the_majority, max_ticks=300)
+        self.assertTrue(ok)
 
 
 if __name__ == "__main__":
