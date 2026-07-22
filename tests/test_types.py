@@ -27,6 +27,11 @@ class TestPackageVersion(unittest.TestCase):
 
         self.assertRegex(raftkv.__version__, r"^\d+\.\d+\.\d+$")
 
+    def test_package_version_is_importable_directly_from_the_top_level_package(self):
+        from raftkv import __version__
+
+        self.assertIsInstance(__version__, str)
+
 
 if __name__ == "__main__":
     unittest.main()
