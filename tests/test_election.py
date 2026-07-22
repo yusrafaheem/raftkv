@@ -205,6 +205,17 @@ class TestAppendEntriesCausesElectionStepDown(unittest.TestCase):
         self.assertEqual(node.role, Role.FOLLOWER)
         self.assertEqual(node.leader_id, 2)
 
+    def test_append_entries_at_a_stale_term_does_not_cause_a_leader_to_step_down(self):
+        node = RaftNode(1, [2, 3], rng=random.Random(0))
+        node.role = Role.LEADER
+        node.current_term = 5
+        args = AppendEntriesArgs(
+            term=3, leader_id=2, prev_log_index=0, prev_log_term=0, entries=(), leader_commit=0
+        )
+        node.step(Message(2, 1, args))
+        self.assertEqual(node.role, Role.LEADER)
+        self.assertEqual(node.current_term, 5)
+
 
 if __name__ == "__main__":
     unittest.main()
