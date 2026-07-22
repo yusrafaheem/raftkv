@@ -77,6 +77,16 @@ class TestBasicReplication(unittest.TestCase):
         self.assertEqual(c.nodes[leader].commit_index, 0)
 
 
+class TestProposeReturnsTheAssignedIndexAndTerm(unittest.TestCase):
+    def test_the_index_returned_by_propose_matches_the_entry_actually_appended(self):
+        c = elected_cluster(seed=15)
+        leader = c.leader()
+        result = c.propose(Command("client", 1, SetCommand("x", "1")), via=leader)
+        appended = c.nodes[leader].log.get(result.index)
+        self.assertEqual(appended.command.op.key, "x")
+        self.assertEqual(appended.term, c.nodes[leader].current_term)
+
+
 class TestLogMatchingAndConflictResolution(unittest.TestCase):
     """Direct unit tests of the AppendEntries receiver logic (Raft section
     5.3): a follower must delete conflicting entries and adopt the
