@@ -72,6 +72,12 @@ class TestCompareAndSwap(unittest.TestCase):
         self.assertFalse(result)
         self.assertEqual(self.sm.get("x"), "1")
 
+    def test_cas_where_new_value_equals_the_current_value_still_counts_as_a_success(self):
+        self.sm.apply(Command("c", 1, SetCommand("x", "same")))
+        result = self.sm.apply(Command("c", 2, CompareAndSwapCommand("x", "same", "same")))
+        self.assertTrue(result)
+        self.assertEqual(self.sm.get("x"), "same")
+
     def test_only_one_of_two_racing_cas_calls_can_win(self):
         self.sm.apply(Command("c", 1, SetCommand("x", "start")))
         first = self.sm.apply(Command("a", 1, CompareAndSwapCommand("x", "start", "from-a")))
