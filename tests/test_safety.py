@@ -141,6 +141,37 @@ class TestLogMatchingProperty(unittest.TestCase):
                             )
 
 
+class TestLeaderCompleteness(unittest.TestCase):
+    def test_every_new_leader_still_has_every_previously_committed_entry(self):
+        for seed in range(15):
+            with self.subTest(seed=seed):
+                c = SimulatedCluster([1, 2, 3, 4, 5], seed=seed)
+                c.run_until(lambda cl: cl.leader() is not None, max_ticks=200)
+                committed_commands: list = []
+
+                for i in range(1, 9):
+                    leader = c.leader()
+                    if leader is not None:
+                        result = c.propose(Command("c", i, SetCommand("k", str(i))), via=leader)
+                        if c.run_until(
+                            lambda cl, idx=result.index: cl.is_committed_everywhere(idx),
+                            max_ticks=150,
+                        ):
+                            committed_commands.append(result.index)
+                    if i == 4 and len(c.alive) > 3:
+                        c.kill(c.leader())
+                        c.run_until(lambda cl: cl.leader() is not None, max_ticks=300)
+
+                new_leader = c.leader()
+                if new_leader is not None:
+                    for idx in committed_commands:
+                        self.assertIsNotNone(
+                            c.nodes[new_leader].log.get(idx),
+                            f"seed={seed}: new leader {new_leader} is missing "
+                            f"previously-committed index {idx}",
+                        )
+
+
 class TestStateMachineSafety(unittest.TestCase):
     def test_every_node_applies_the_same_command_at_the_same_index(self):
         for seed in range(25):
