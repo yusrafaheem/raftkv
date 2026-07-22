@@ -16,5 +16,12 @@ class TestRoleEnum(unittest.TestCase):
         self.assertIsInstance(Role.LEADER, str)
 
 
+class TestPackageVersion(unittest.TestCase):
+    def test_package_exposes_a_version_string(self):
+        import raftkv
+
+        self.assertRegex(raftkv.__version__, r"^\d+\.\d+\.\d+$")
+
+
 if __name__ == "__main__":
     unittest.main()
